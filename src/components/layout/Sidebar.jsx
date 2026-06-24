@@ -1,124 +1,116 @@
-/**
- * Sidebar Component
- * 
- * Navigation sidebar with icons, active state highlighting,
- * user info, and logout button. Collapsible on mobile.
- */
-
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Code2, StickyNote, Briefcase, FileText, BarChart3, LogOut, ChevronLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useAuth from '../../hooks/useAuth';
-import { NAV_ITEMS } from '../../utils/constants';
+import { useState } from 'react';
 
-/**
- * SVG Icons map — keeps the sidebar self-contained
- * without needing an external icon library.
- */
-const icons = {
-  LayoutDashboard: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-    </svg>
-  ),
-  Code2: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m18 16 4-4-4-4" /><path d="m6 8-4 4 4 4" /><path d="m14.5 4-5 16" />
-    </svg>
-  ),
-  StickyNote: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" /><path d="M15 3v4a2 2 0 0 0 2 2h4" />
-    </svg>
-  ),
-  Briefcase: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-    </svg>
-  ),
-  FileText: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" />
-    </svg>
-  ),
-  BarChart3: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" />
-    </svg>
-  ),
-};
+const navItems = [
+  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/problems', label: 'Problems', icon: Code2 },
+  { path: '/notes', label: 'Notes', icon: StickyNote },
+  { path: '/interviews', label: 'Interviews', icon: Briefcase },
+  { path: '/resumes', label: 'Resumes', icon: FileText },
+  { path: '/analytics', label: 'Analytics', icon: BarChart3 },
+];
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <>
       {/* Mobile backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
-          onClick={onClose}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={onClose} />
+        )}
+      </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-gray-800 bg-gray-950 transition-transform duration-300
-          lg:static lg:translate-x-0
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
-      >
+      <aside className={`
+        fixed left-0 top-0 z-50 flex h-full flex-col border-r border-zinc-800/80 bg-zinc-950 transition-all duration-300 ease-in-out
+        lg:static lg:translate-x-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${collapsed ? 'w-[68px]' : 'w-60'}
+      `}>
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-gray-800 px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold text-sm">
-            IP
+        <div className={`flex h-14 items-center border-b border-zinc-800/80 ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-xs flex-shrink-0">
+              IP
+            </div>
+            {!collapsed && (
+              <span className="text-sm font-semibold text-zinc-100 tracking-tight">Interview Prep</span>
+            )}
           </div>
-          <div>
-            <h1 className="text-sm font-bold text-white">Interview Prep</h1>
-            <p className="text-[10px] text-gray-500">Smart Tracker</p>
-          </div>
+          {!collapsed && (
+            <button onClick={() => setCollapsed(true)}
+              className="hidden lg:flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors cursor-pointer">
+              <ChevronLeft size={14} />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
-                    : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
-                }`
-              }
-            >
-              {icons[item.icon]}
-              {item.label}
-            </NavLink>
-          ))}
+        <nav className={`flex-1 overflow-y-auto py-3 ${collapsed ? 'px-2' : 'px-2.5'}`}>
+          <div className="space-y-0.5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <NavLink key={item.path} to={item.path} onClick={onClose}
+                  className={`relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-all duration-150
+                    ${isActive ? 'text-zinc-100 bg-zinc-800/80' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/40'}
+                    ${collapsed ? 'justify-center' : ''}
+                  `}>
+                  {isActive && (
+                    <motion.div layoutId="nav-active" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r-full bg-indigo-500"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }} />
+                  )}
+                  <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
+                  {!collapsed && <span>{item.label}</span>}
+                </NavLink>
+              );
+            })}
+          </div>
         </nav>
 
-        {/* User Info & Logout */}
-        <div className="border-t border-gray-800 p-4">
-          <div className="flex items-center gap-3 rounded-xl bg-gray-900/50 p-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm font-bold text-white">
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-medium text-gray-200">{user?.name || 'User'}</p>
-              <p className="truncate text-xs text-gray-500">{user?.email}</p>
-            </div>
+        {/* Expand button (collapsed mode) */}
+        {collapsed && (
+          <div className="px-2 pb-2">
+            <button onClick={() => setCollapsed(false)}
+              className="flex w-full items-center justify-center rounded-lg py-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/40 transition-colors cursor-pointer">
+              <ChevronLeft size={14} className="rotate-180" />
+            </button>
           </div>
-          <button
-            onClick={logout}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-800 px-3 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-rose-400 transition-all duration-200 cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            Logout
-          </button>
+        )}
+
+        {/* User / Logout */}
+        <div className={`border-t border-zinc-800/80 ${collapsed ? 'p-2' : 'p-3'}`}>
+          {!collapsed ? (
+            <>
+              <div className="flex items-center gap-2.5 rounded-lg p-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-semibold text-white flex-shrink-0">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-medium text-zinc-200">{user?.name || 'User'}</p>
+                  <p className="truncate text-[11px] text-zinc-500">{user?.email}</p>
+                </div>
+              </div>
+              <button onClick={logout}
+                className="mt-1.5 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-colors cursor-pointer">
+                <LogOut size={16} />
+                <span>Log out</span>
+              </button>
+            </>
+          ) : (
+            <button onClick={logout} title="Log out"
+              className="flex w-full items-center justify-center rounded-lg py-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-colors cursor-pointer">
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </aside>
     </>

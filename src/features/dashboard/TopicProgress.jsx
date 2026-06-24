@@ -1,53 +1,48 @@
-/**
- * TopicProgress Component
- * 
- * Shows progress bars for each DSA topic.
- */
-
 import Card from '../../components/ui/Card';
+import { groupBy } from '../../utils/helpers';
 import { TOPICS } from '../../utils/constants';
 
 const TopicProgress = ({ problems }) => {
-  // Calculate solved count per topic
-  const topicStats = TOPICS.map((topic) => {
-    const total = problems.filter((p) => p.topic === topic).length;
-    const solved = problems.filter((p) => p.topic === topic && p.solved).length;
-    return { topic, total, solved };
-  }).filter((t) => t.total > 0) // Only show topics that have problems
-    .sort((a, b) => b.total - a.total); // Sort by most problems
+  const solved = problems.filter(p => p.solved);
+  const topicCounts = groupBy(solved, 'topic');
+  const allCounts = groupBy(problems, 'topic');
 
-  const colors = [
-    'from-indigo-500 to-blue-500',
-    'from-emerald-500 to-green-500',
-    'from-amber-500 to-orange-500',
-    'from-rose-500 to-pink-500',
-    'from-purple-500 to-violet-500',
-    'from-cyan-500 to-teal-500',
-  ];
+  const topicData = TOPICS
+    .map(t => ({ name: t, solved: topicCounts[t] || 0, total: allCounts[t] || 0 }))
+    .filter(t => t.total > 0)
+    .sort((a, b) => b.solved - a.solved)
+    .slice(0, 8);
+
+  const maxVal = Math.max(...topicData.map(t => t.total), 1);
 
   return (
     <Card>
-      <h3 className="mb-4 text-sm font-semibold text-gray-300">Topic Progress</h3>
-      {topicStats.length === 0 ? (
-        <p className="text-sm text-gray-500 py-4 text-center">No problems added yet</p>
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="text-sm font-medium text-zinc-300">Topic Progress</h3>
+          <p className="text-xs text-zinc-600 mt-0.5">Top {topicData.length} practiced topics</p>
+        </div>
+      </div>
+
+      {topicData.length === 0 ? (
+        <p className="text-sm text-zinc-600 py-8 text-center">No problems solved yet</p>
       ) : (
-        <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-          {topicStats.map((stat, idx) => (
-            <div key={stat.topic}>
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-gray-400">{stat.topic}</span>
-                <span className="text-gray-500">
-                  {stat.solved}/{stat.total}
-                </span>
+        <div className="space-y-3">
+          {topicData.map(t => {
+            const pct = t.total > 0 ? Math.round((t.solved / t.total) * 100) : 0;
+            return (
+              <div key={t.name}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-zinc-400 truncate">{t.name}</span>
+                  <span className="text-[11px] text-zinc-500 tabular-nums ml-2">{t.solved}/{t.total}</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-zinc-800/80">
+                  <div className="h-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700"
+                    style={{ width: `${pct}%` }} />
+                </div>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-gray-800">
-                <div
-                  className={`h-1.5 rounded-full bg-gradient-to-r ${colors[idx % colors.length]} transition-all duration-500`}
-                  style={{ width: stat.total > 0 ? `${(stat.solved / stat.total) * 100}%` : '0%' }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Card>

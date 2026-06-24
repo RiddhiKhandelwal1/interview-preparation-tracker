@@ -1,91 +1,56 @@
-/**
- * ProblemsPage
- * 
- * Full problem tracker with add/edit modal, filter bar, and problem list.
- * 
- * React Hooks Concept:
- * - useState: Manages local UI state (modal open, selected problem)
- * - These are not global state — they're transient UI concerns
- */
-
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProblems } from '../redux/slices/problemSlice';
 import AppLayout from '../components/layout/AppLayout';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
-import Spinner from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Spinner';
 import ProblemForm from '../features/problems/ProblemForm';
 import ProblemList from '../features/problems/ProblemList';
 import FilterBar from '../features/problems/FilterBar';
 import useAuth from '../hooks/useAuth';
+import { Plus, Code2 } from 'lucide-react';
 
 const ProblemsPage = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const { status } = useSelector((state) => state.problems);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProblem, setEditingProblem] = useState(null);
 
-  useEffect(() => {
-    if (user) dispatch(fetchProblems(user.$id));
-  }, [dispatch, user]);
+  useEffect(() => { if (user) dispatch(fetchProblems(user.$id)); }, [dispatch, user]);
 
-  const handleAdd = () => {
-    setEditingProblem(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (problem) => {
-    setEditingProblem(problem);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingProblem(null);
-  };
+  const handleAdd = () => { setEditingProblem(null); setIsModalOpen(true); };
+  const handleEdit = (problem) => { setEditingProblem(problem); setIsModalOpen(true); };
+  const handleClose = () => { setIsModalOpen(false); setEditingProblem(null); };
 
   return (
     <AppLayout title="Problems">
-      <div className="space-y-6">
-        {/* Header */}
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-white">Problem Tracker</h2>
-            <p className="text-sm text-gray-400">Track your coding problems and progress</p>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10">
+              <Code2 size={16} className="text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-[15px] font-semibold text-zinc-100">Problem Tracker</h2>
+              <p className="text-xs text-zinc-500">Track and organize your coding problems</p>
+            </div>
           </div>
-          <Button onClick={handleAdd}>
-            + Add Problem
-          </Button>
+          <Button onClick={handleAdd} size="sm"><Plus size={14} /> Add Problem</Button>
         </div>
 
-        {/* Filters */}
         <FilterBar />
 
-        {/* Problem List */}
         {status === 'loading' ? (
-          <div className="flex justify-center py-20">
-            <Spinner size="lg" />
-          </div>
+          <div className="space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}</div>
         ) : (
           <ProblemList onEdit={handleEdit} onAdd={handleAdd} />
         )}
       </div>
 
-      {/* Add/Edit Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title={editingProblem ? 'Edit Problem' : 'Add Problem'}
-        size="lg"
-      >
-        <ProblemForm
-          key={editingProblem?.$id || 'new'}
-          problem={editingProblem}
-          onClose={handleCloseModal}
-        />
+      <Modal isOpen={isModalOpen} onClose={handleClose} title={editingProblem ? 'Edit Problem' : 'Add Problem'} size="lg">
+        <ProblemForm key={editingProblem?.$id || 'new'} problem={editingProblem} onClose={handleClose} />
       </Modal>
     </AppLayout>
   );

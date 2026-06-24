@@ -1,26 +1,18 @@
-/**
- * Badge Component
- * 
- * Small colored label for tags, difficulty levels, and statuses.
- */
-
-const Badge = ({ children, variant = 'default', className = '' }) => {
-  const variants = {
-    default: 'bg-gray-800 text-gray-300',
-    easy: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
-    medium: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-    hard: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',
-    info: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-    success: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
-    warning: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-    danger: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',
-    purple: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
+const Badge = ({ children, variant = 'default', className = '', dot = false }) => {
+  const v = {
+    default: 'bg-zinc-800 text-zinc-400',
+    easy: 'bg-emerald-500/10 text-emerald-400',
+    medium: 'bg-amber-500/10 text-amber-400',
+    hard: 'bg-red-500/10 text-red-400',
+    info: 'bg-blue-500/10 text-blue-400',
+    success: 'bg-emerald-500/10 text-emerald-400',
+    warning: 'bg-amber-500/10 text-amber-400',
+    danger: 'bg-red-500/10 text-red-400',
+    purple: 'bg-violet-500/10 text-violet-400',
   };
-
   return (
-    <span
-      className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium ${variants[variant]} ${className}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wide uppercase ${v[variant]} ${className}`}>
+      {dot && <span className={`h-1.5 w-1.5 rounded-full bg-current opacity-70`} />}
       {children}
     </span>
   );

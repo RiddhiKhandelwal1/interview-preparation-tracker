@@ -1,26 +1,12 @@
-/**
- * Header Component
- * 
- * Top navigation bar with mobile menu toggle and page title.
- */
+import { Menu } from 'lucide-react';
 
-const Header = ({ title, onMenuToggle }) => {
-  return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-800 bg-gray-950/80 backdrop-blur-lg px-6">
-      {/* Mobile menu button */}
-      <button
-        onClick={onMenuToggle}
-        className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white lg:hidden transition-colors cursor-pointer"
-        aria-label="Toggle menu"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="18" x2="20" y2="18" />
-        </svg>
-      </button>
-
-      <h1 className="text-lg font-semibold text-white">{title}</h1>
-    </header>
-  );
-};
+const Header = ({ title, onMenuToggle }) => (
+  <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl px-4 lg:px-6">
+    <button onClick={onMenuToggle} className="rounded-md p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 lg:hidden transition-colors cursor-pointer" aria-label="Toggle menu">
+      <Menu size={18} />
+    </button>
+    <h1 className="text-[15px] font-semibold text-zinc-100 tracking-tight">{title}</h1>
+  </header>
+);
 
 export default Header;

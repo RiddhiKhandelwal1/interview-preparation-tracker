@@ -1,49 +1,20 @@
-/**
- * Button Component
- * 
- * Reusable button with multiple variants and sizes.
- * Handles loading state by showing a spinner and disabling interaction.
- */
-
 import Spinner from './Spinner';
 
-const Button = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  loading = false,
-  disabled = false,
-  type = 'button',
-  className = '',
-  onClick,
-  ...props
-}) => {
-  const baseClasses =
-    'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-950 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
-
-  const variantClasses = {
-    primary: 'bg-indigo-600 hover:bg-indigo-500 text-white focus:ring-indigo-500 shadow-lg shadow-indigo-500/25',
-    secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-200 focus:ring-gray-600 border border-gray-700',
-    danger: 'bg-rose-600 hover:bg-rose-500 text-white focus:ring-rose-500 shadow-lg shadow-rose-500/25',
-    ghost: 'bg-transparent hover:bg-gray-800 text-gray-400 hover:text-gray-200 focus:ring-gray-600',
-    success: 'bg-emerald-600 hover:bg-emerald-500 text-white focus:ring-emerald-500 shadow-lg shadow-emerald-500/25',
+const Button = ({ children, variant = 'primary', size = 'md', loading = false, disabled = false, type = 'button', className = '', onClick, ...props }) => {
+  const base = 'relative inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer select-none';
+  const variants = {
+    primary: 'bg-indigo-600 text-white hover:bg-indigo-500 active:bg-indigo-700 shadow-sm shadow-indigo-500/20 hover:shadow-indigo-500/30',
+    secondary: 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600',
+    danger: 'bg-red-600/10 text-red-400 hover:bg-red-600/20 border border-red-500/20',
+    ghost: 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60',
+    success: 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm shadow-emerald-500/20',
   };
-
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-  };
+  const sizes = { xs: 'h-7 px-2.5 text-xs', sm: 'h-8 px-3 text-xs', md: 'h-9 px-4 text-sm', lg: 'h-11 px-6 text-sm' };
 
   return (
-    <button
-      type={type}
-      disabled={disabled || loading}
-      onClick={onClick}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      {...props}
-    >
-      {loading && <Spinner size="sm" />}
+    <button type={type} disabled={disabled || loading} onClick={onClick}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
+      {loading ? <Spinner size="sm" /> : null}
       {children}
     </button>
   );

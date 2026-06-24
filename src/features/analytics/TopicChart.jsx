@@ -1,65 +1,40 @@
-/**
- * TopicChart Component
- * 
- * Horizontal bar chart showing problem count per topic.
- */
-
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import Card from '../../components/ui/Card';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
 import { groupBy } from '../../utils/helpers';
 
-const COLORS = [
-  '#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd',
-  '#10b981', '#34d399', '#6ee7b7',
-  '#f59e0b', '#fbbf24', '#fcd34d',
-  '#ef4444', '#f87171',
-];
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload?.length) {
+    return <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 shadow-xl text-xs"><p className="text-zinc-300">{label}: <span className="font-semibold text-zinc-100">{payload[0].value}</span></p></div>;
+  }
+  return null;
+};
 
 const TopicChart = ({ problems }) => {
-  const solvedProblems = problems.filter((p) => p.solved);
-  const topicCounts = groupBy(solvedProblems, 'topic');
-
+  const solved = problems.filter(p => p.solved);
+  const topicCounts = groupBy(solved, 'topic');
   const data = Object.entries(topicCounts)
-    .map(([topic, count]) => ({ topic, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10); // Top 10 topics
-
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 shadow-xl">
-          <p className="text-xs text-gray-200">
-            {payload[0].payload.topic}: <strong>{payload[0].value}</strong>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+    .map(([name, value]) => ({ name: name.length > 12 ? name.substring(0, 12) + '…' : name, value, fullName: name }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 12);
 
   return (
     <Card>
-      <h3 className="mb-4 text-sm font-semibold text-gray-300">Topic Distribution</h3>
+      <h3 className="text-sm font-medium text-zinc-300 mb-1">Topic Distribution</h3>
+      <p className="text-xs text-zinc-600 mb-4">Problems solved by topic</p>
       {data.length === 0 ? (
-        <p className="text-sm text-gray-500 py-8 text-center">No solved problems yet</p>
+        <p className="text-sm text-zinc-600 py-12 text-center">No data yet</p>
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#6b7280' }} />
-            <YAxis
-              type="category"
-              dataKey="topic"
-              tick={{ fontSize: 11, fill: '#9ca3af' }}
-              width={100}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-              {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} layout="vertical" margin={{ left: 0, right: 12, top: 0, bottom: 0 }}>
+              <CartesianGrid horizontal={false} stroke="#27272a" />
+              <XAxis type="number" tick={{ fill: '#52525b', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="name" tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(63,63,70,0.2)' }} />
+              <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={16} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </Card>
   );

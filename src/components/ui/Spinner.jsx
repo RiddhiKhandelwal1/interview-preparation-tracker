@@ -1,38 +1,29 @@
-/**
- * Spinner Component
- * 
- * A reusable loading spinner with configurable size.
- * Uses CSS animation for the spinning effect.
- */
+import { forwardRef } from 'react';
 
 const Spinner = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-8 w-8 border-3',
-    lg: 'h-12 w-12 border-4',
-    xl: 'h-16 w-16 border-4',
-  };
-
+  const sizes = { sm: 'h-3.5 w-3.5', md: 'h-5 w-5', lg: 'h-8 w-8', xl: 'h-12 w-12' };
   return (
-    <div
-      className={`animate-spin rounded-full border-solid border-indigo-500 border-t-transparent ${sizeClasses[size]} ${className}`}
-      role="status"
-      aria-label="Loading"
-    />
+    <svg className={`animate-spin ${sizes[size]} ${className}`} viewBox="0 0 24 24" fill="none" role="status" aria-label="Loading">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.15" />
+      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
   );
 };
 
-/**
- * FullPageSpinner — centers a large spinner in the viewport.
- * Used during initial auth check and page transitions.
- */
 export const FullPageSpinner = () => (
-  <div className="flex min-h-screen items-center justify-center bg-gray-950">
+  <div className="flex min-h-screen items-center justify-center" style={{ background: '#09090b' }}>
     <div className="flex flex-col items-center gap-4">
-      <Spinner size="xl" />
-      <p className="text-sm text-gray-400 animate-pulse">Loading...</p>
+      <div className="relative">
+        <div className="absolute inset-0 rounded-full bg-indigo-500/20 blur-xl animate-pulse" />
+        <Spinner size="xl" className="relative text-indigo-500" />
+      </div>
+      <p className="text-sm text-zinc-500 font-medium tracking-wide">Loading...</p>
     </div>
   </div>
+);
+
+export const Skeleton = ({ className = '', ...props }) => (
+  <div className={`skeleton rounded-lg ${className}`} {...props} />
 );
 
 export default Spinner;
