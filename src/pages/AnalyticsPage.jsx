@@ -7,6 +7,7 @@ import DifficultyChart from '../features/analytics/DifficultyChart';
 import TopicChart from '../features/analytics/TopicChart';
 import TrendChart from '../features/analytics/TrendChart';
 import InsightsPanel from '../features/analytics/InsightsPanel';
+import AICoach from '../features/analytics/AICoach';
 import useAuth from '../hooks/useAuth';
 import { BarChart3 } from 'lucide-react';
 
@@ -38,6 +39,8 @@ const AnalyticsPage = () => {
         ) : (
           <div className="space-y-4">
             <InsightsPanel problems={problems} />
+            <AICoach problems={problems} />
+
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <DifficultyChart problems={problems} />
               <TrendChart problems={problems} />
